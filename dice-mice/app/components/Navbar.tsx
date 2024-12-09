@@ -20,6 +20,7 @@ const Navbar = () => {
       const response = await axios.get('https://your-backend-url/auth/login', {
         withCredentials: true, // Include cookies for session tracking, if used
       });
+      console.log('response', response);
 
       // The backend should handle the redirect to Discord
     } catch (error) {
