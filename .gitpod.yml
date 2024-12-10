@@ -1,0 +1,36 @@
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+  - name: Setup Backend
+    init: |
+      # Clone the backend repository into a `backend` folder
+      git clone https://github.com/TiciaD/DiceMice_Backend.git backend
+      cd backend
+      # Ensure the backend's GitPod setup is sourced
+      .gitpod.yml
+    command: |
+      cd backend
+      dotnet dev-certs https
+      dotnet tool install --global dotnet-ef
+      export PATH="$PATH:~/.dotnet/tools"
+      dotnet restore
+      dotnet run
+  - name: Setup Frontend
+    init: |
+      # Ensure the frontend dependencies are installed
+      cd dice-mice
+      npm install
+    command: |
+      npm run dev
+
+ports:
+  - port: 3000 # Next.js dev server
+    onOpen: open-preview
+  - port: 5001 # .NET backend server
+    onOpen: open-preview
+
+vscode:
+  extensions:
+    - muhammad-sammy.csharp # Backend
+    - esbenp.prettier-vscode # Frontend
