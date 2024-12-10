@@ -1,5 +1,6 @@
 'use client';
 
+import api from '@/utils/axios';
 import { Dialog, DialogPanel } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/16/solid';
 import axios from 'axios';
@@ -13,19 +14,11 @@ const navigation = [
 ];
 
 const Navbar = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleLogin = async () => {
-    try {
-      // Make a request to the backend to start the login process
-      const response = await axios.get('https://your-backend-url/auth/login', {
-        withCredentials: true, // Include cookies for session tracking, if used
-      });
-      console.log('response', response);
-
-      // The backend should handle the redirect to Discord
-    } catch (error) {
-      console.error('Error during login:', error);
-    }
+    setIsLoading(true); // Show a spinner or disable login button
+    window.location.href = process.env.NEXT_PUBLIC_API_URL + '/auth/login';
   };
 
   return (
