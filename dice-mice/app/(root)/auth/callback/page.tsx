@@ -1,6 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react';
 
 const Callback = () => {
   const searchParams = useSearchParams()
@@ -14,7 +15,7 @@ const Callback = () => {
     localStorage.setItem('refreshToken', refreshToken as string);
   }
 
-  return <p>Redirecting...</p>;
+  return <Suspense><p>Redirecting...</p></Suspense>;
 };
 
 export default Callback;
