@@ -1,9 +1,7 @@
 'use client';
 
-import api from '@/utils/axios';
 import { Dialog, DialogPanel } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/16/solid';
-import axios from 'axios';
 import React, { useState } from 'react';
 
 const navigation = [
@@ -14,10 +12,8 @@ const navigation = [
 ];
 
 const Navbar = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleLogin = async () => {
-    setIsLoading(true); // Show a spinner or disable login button
     window.location.href = process.env.NEXT_PUBLIC_API_URL + '/auth/login';
   };
 
