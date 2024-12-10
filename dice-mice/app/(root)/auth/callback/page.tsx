@@ -1,21 +1,30 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-const Callback = () => {
-  const searchParams = useSearchParams()
+const CallbackContent = () => {
+  const searchParams = useSearchParams();
 
   const token = searchParams.get('token');
   const refreshToken = searchParams.get('refreshToken');
 
   if (token && refreshToken) {
     // Save tokens to localStorage (or cookies if preferred)
-    localStorage.setItem('token', token as string);
-    localStorage.setItem('refreshToken', refreshToken as string);
+    localStorage.setItem('token', token);
+    localStorage.setItem('refreshToken', refreshToken);
   }
 
-  return <Suspense><p>Redirecting...</p></Suspense>;
+  return <p>Redirecting...</p>;
+};
+
+const Callback = () => {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <CallbackContent />
+    </Suspense>
+  );
 };
 
 export default Callback;
+
