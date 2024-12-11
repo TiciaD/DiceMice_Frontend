@@ -22,86 +22,57 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(false); // Prevents multiple fetch attempts
   const router = useRouter();
 
-  // useEffect(() => {
-  // const fetchUser = async () => {
-  //   console.log('fetching', fetching);
-  // if (fetching) return; // Prevent re-entry
-  // setFetching(true);
+  useEffect(() => {
+    let token = localStorage.getItem('token') ?? '';
+    if (!token) {
+      return
+    } else {
+      console.log("is the token valid?", isTokenValid(token))
+      // Check if token is expired
+      if (!isTokenValid(token)) {
+        window.location.href = process.env.NEXT_PUBLIC_API_URL + '/auth/login';
+      } else {
+        fetchUser(token)
+      }
+    }
+  }, [router])
 
-  // let token = localStorage.getItem('token') ?? '';
-  // console.log('token', token);
-  // if (!token) {
-  //   try {
-  //     const { data: loginData } = await api.get('/auth/login');
-  //     console.log('login data', loginData);
-  //     token = loginData.token; // Extract token from login response
-  //     const refreshToken = loginData.refreshToken; // Save refresh token too
+  const fetchUser = async (token: string) => {
+    console.log("fetching user")
+    try {
+      // With a valid token, fetch user data
+      const { data: userData } = await api.get('/auth/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("fetch user response", userData)
 
-  //     localStorage.setItem('token', token);
-  //     localStorage.setItem('refreshToken', refreshToken);
-  //   } catch (error) {
-  //     console.error('Error initiating login flow:', error);
-  //     setFetching(false); // Stop fetch attempts
-  //     setLoading(false);
-  //     // router.push('/unauthorized'); // Redirect to unauthorized page on error
-  //     return;
-  //   }
-  //   return;
-  // }
+      setUser(userData.user as User)
 
-  //   try {
-  //     // With a valid token, fetch user data
-  //     const { data: userData } = await api.get('/auth/me', {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
+      localStorage.setItem('userId', userData.user.discordId);
+      localStorage.setItem('avatar', userData.user.avatar);
+    } catch (error: any) {
+      console.error('Failed to fetch user data:', error);
+      handleLogout()
+    } finally {
+      setLoading(false); // Ensure loading stops
+    }
+  }
 
-  //     setUser(userData); // Save user data to state
-  //   } catch (error: any) {
-  //     if (error.response?.status === 401) {
-  //       // Token might be expired; try refreshing it
-  // await handleTokenRefresh();
-  //     } else {
-  //       console.error(
-  //         'Failed to fetch user data:',
-  //         error.response?.statusText
-  //       );
-  //       router.push('/unauthorized');
-  //     }
-  //   } finally {
-  //     setFetching(false); // Stop fetch attempts
-  //     setLoading(false);
-  //   }
-  // };
+  const isTokenValid = (token: string) => {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 > Date.now(); // `exp` is in seconds, so multiply by 1000
+  };
 
-  // const handleTokenRefresh = async () => {
-  //   try {
-  //     const refreshToken = localStorage.getItem('refreshToken');
-  //     if (!refreshToken) {
-  //       throw new Error('No refresh token found');
-  //     }
-
-  //     const { data: refreshData } = await api.post('/auth/refresh', {
-  //       refreshToken,
-  //     });
-
-  //     const newToken = refreshData.token;
-  //     localStorage.setItem('token', newToken);
-  //     fetchUser(); // Retry fetching the user after refreshing the token
-  //   } catch (error) {
-  //     console.error('Error refreshing token:', error);
-  //     localStorage.removeItem('token');
-  //     localStorage.removeItem('refreshToken');
-  //     router.push('/unauthorized');
-  //     setFetching(false); // Stop fetch attempts
-  //     setLoading(false);
-  //   }
-  // };
-
-  //   fetchUser();
-  // }, [router]);
+  const handleLogout = () => {
+    // Clear user data and localStorage on logout
+    setUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('avatar');
+    router.push('/'); // Redirect to home page
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, setUser }}>

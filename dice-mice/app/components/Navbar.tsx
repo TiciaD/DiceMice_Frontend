@@ -3,17 +3,19 @@
 import { Dialog, DialogPanel } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/16/solid';
 import React, { useState } from 'react';
+import { DiscordLogin } from './DiscordLogin';
+import Link from 'next/link';
 
 const navigation = [
-  { name: 'Product', href: '#' },
-  { name: 'Features', href: '#' },
-  { name: 'Marketplace', href: '#' },
-  { name: 'Company', href: '#' },
+  { name: 'About', href: '/about' },
+  { name: 'Counties', href: '/counties' },
+  { name: 'Houses', href: '/houses' },
+  { name: 'Mice', href: '/mice' },
 ];
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const handleLogin = async () => {
+  const handleLogin = () => {
     window.location.href = process.env.NEXT_PUBLIC_API_URL + '/auth/login';
   };
 
@@ -25,14 +27,14 @@ const Navbar = () => {
           className='mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8'
         >
           <div className='flex lg:flex-1'>
-            <a href='#' className='-m-1.5 p-1.5'>
-              <span className='sr-only'>Your Company</span>
+            <Link href='/' className='-m-1.5 p-1.5'>
+              <span className='sr-only'>Dice Mice</span>
               <img
                 alt=''
                 src='https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600'
                 className='h-8 w-auto'
               />
-            </a>
+            </Link>
           </div>
           <div className='flex lg:hidden'>
             <button
@@ -46,23 +48,17 @@ const Navbar = () => {
           </div>
           <div className='hidden lg:flex lg:gap-x-12'>
             {navigation.map((item) => (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
                 className='text-sm/6 font-semibold text-gray-900'
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </div>
           <div className='hidden lg:flex lg:flex-1 lg:justify-end'>
-            <a
-              href='#'
-              onClick={handleLogin}
-              className='text-sm/6 font-semibold text-gray-900'
-            >
-              Log in <span aria-hidden='true'>&rarr;</span>
-            </a>
+            <DiscordLogin />
           </div>
         </nav>
         <Dialog
@@ -94,23 +90,17 @@ const Navbar = () => {
               <div className='-my-6 divide-y divide-gray-500/10'>
                 <div className='space-y-2 py-6'>
                   {navigation.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
                       href={item.href}
                       className='-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50'
                     >
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
                 <div className='py-6'>
-                  <a
-                    onClick={handleLogin}
-                    href='#'
-                    className='-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50'
-                  >
-                    Log in
-                  </a>
+                  <div className='flex items-center gap-4'><DiscordLogin /><span className='text-black ml-1'>Account</span></div>
                 </div>
               </div>
             </div>
