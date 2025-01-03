@@ -25,27 +25,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
-    let token = localStorage.getItem('token') ?? '';
-    if (!token) {
-      return
-    } else {
-      console.log("is the token valid?", isTokenValid(token))
-      // Check if token is expired
-      if (!isTokenValid(token)) {
-        window.location.href = process.env.NEXT_PUBLIC_API_URL + '/auth/login';
-      } else {
-        fetchUser(token)
-      }
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetchUser(token);
     }
-  }, [router])
+  }, []);
 
   const fetchUser = async (token: string) => {
     console.log("fetching user")
     try {
       // With a valid token, fetch user data
-      const { data: userData } = await api.get('/auth/me', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data: userData } = await api.get('/auth/me'); // Axios interceptor checks token validity
       console.log("fetch user response", userData)
 
       setUser(userData.user as User)
@@ -60,18 +50,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  const isTokenValid = (token: string) => {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.exp * 1000 > Date.now(); // `exp` is in seconds, so multiply by 1000
-  };
-
   const handleLogout = () => {
     // Clear user data and localStorage on logout
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('avatar');
-    router.push('/'); // Redirect to home page
+    router.push('/loggedout'); // Redirect to logged out page
   };
 
   return (
